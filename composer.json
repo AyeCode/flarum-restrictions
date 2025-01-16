@@ -1,7 +1,7 @@
 {
   "name": "ayecode/flarum-restrictions",
-  "description": "Restrict Flarum content based on EDD licenses",
   "version": "0.1.0",
+  "description": "Restrict Flarum content based on EDD licenses",
   "type": "flarum-extension",
   "keywords": [
     "flarum",
@@ -34,6 +34,11 @@
         "backgroundColor": "#238636",
         "color": "#fff"
       }
+    },
+    "flarum-assets": {
+      "forum": [
+        "js/forum/index.js"
+      ]
     }
   }
 }
