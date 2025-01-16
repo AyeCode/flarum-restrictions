@@ -8,29 +8,38 @@ class LicenseChecker
 {
     private function get_cookie_data()
     {
-        // Add debug logging
+        // Debug log all cookies
         file_put_contents(
             storage_path('logs/cookie-debug.log'),
-            "Cookies: " . print_r($_COOKIE, true) . "\n",
+            "Checking cookies: " . print_r($_COOKIE, true) . "\n",
             FILE_APPEND
         );
 
-        // For testing - return null or parse your actual cookie
+        // Look for our specific cookie
+        if (isset($_COOKIE['ayecode_licenses'])) {
+            $license_data = json_decode($_COOKIE['ayecode_licenses'], true);
+
+            file_put_contents(
+                storage_path('logs/cookie-debug.log'),
+                "Found license data: " . print_r($license_data, true) . "\n",
+                FILE_APPEND
+            );
+
+            return $license_data;
+        }
+
         return null;
     }
 
     public function can_access(User $user = null): bool
     {
-        // Debug log the check
-        file_put_contents(
-            storage_path('logs/cookie-debug.log'),
-            "Checking access for user: " . ($user ? $user->id : 'guest') . "\n",
-            FILE_APPEND
-        );
-
         $cookie_data = $this->get_cookie_data();
 
-        // For now return false to restrict everyone
+        // If we have cookie data, check for location manager license
+        if ($cookie_data && isset($cookie_data['products'])) {
+            return in_array('123', $cookie_data['products']); // 123 is location manager product ID
+        }
+
         return false;
     }
 }
