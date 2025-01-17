@@ -13,7 +13,7 @@ class TagPolicy extends AbstractPolicy
     {
         if ($tag->slug !== 'general') {
             $checker = new LicenseChecker();
-            if (!$checker->can_access($actor)) {
+            if (!$checker->can_access($actor, $tag->slug)) {
                 return false;
             }
         }
