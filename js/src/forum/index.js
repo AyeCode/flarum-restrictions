@@ -24,11 +24,16 @@ app.initializers.add('ayecode/flarum-restrictions', function () {
 
         // Only check if we have a discussion and haven't shown alert yet
         if (discussionId && !currentAlert && !this.discussion.canReply()) {
-            console.log(1234);
-            currentAlert = app.alerts.show(
-                { type: 'error' },
-                'You must have a valid license to reply to this discussion.'
-            );
+            // Check if discussion has tags and none of them is 'general'
+            const tags = this.discussion.tags();
+            const hasNonGeneralTag = tags && tags.some(tag => tag.slug() !== 'general');
+
+            if (hasNonGeneralTag) {
+                currentAlert = app.alerts.show(
+                    { type: 'error' },
+                    'You must have a valid license to reply to this discussion.'
+                );
+            }
         }
     });
 
@@ -38,8 +43,8 @@ app.initializers.add('ayecode/flarum-restrictions', function () {
         // Only check if tag has changed and we haven't shown alert yet
         if (currentTag && currentTag !== lastCheckedTag) {
             lastCheckedTag = currentTag;
-            console.log(123);
-            if (!currentTag.canStartDiscussion()) {
+
+            if (currentTag.slug() !== 'general' && !currentTag.canStartDiscussion()) {
                 currentAlert = app.alerts.show(
                     { type: 'error' },
                     'You must have a valid license to start a discussion in this section.'

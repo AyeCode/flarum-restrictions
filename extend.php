@@ -60,7 +60,7 @@ return [
                         $checker = new LicenseChecker();
                         if (!$checker->can_access($serializer->getActor(), $tag->slug)) {
                             $attributes['canReply'] = false;
-                            $attributes['replyPlaceholder'] = 'You must have a valid license to reply to this discussion. <a href="https://wpgeodirectory.com/downloads/location-manager/" class="Button Button--link">Purchase License</a>';
+                           // $attributes['replyPlaceholder'] = 'You must have a valid license to reply to this discussion. <a href="https://wpgeodirectory.com/downloads/location-manager/" class="Button Button--link">Purchase License</a>';
                         }
                     }
                 }
@@ -77,7 +77,7 @@ return [
                 if (!$checker->can_access($serializer->getActor(), $tag->slug)) {
                     $attributes['canStartDiscussion'] = false;
                     $attributes['canAddToDiscussion'] = false;
-                    $attributes['description'] = ($attributes['description'] ?? '') . ' <div class="Alert Alert--warning"><p>You need a valid license to start discussions in this section. <a href="https://wpgeodirectory.com/downloads/location-manager/" class="Button Button--link">Purchase License</a></p></div>';
+                 //   $attributes['description'] = ($attributes['description'] ?? '') . ' <div class="Alert Alert--warning"><p>You need a valid license to start discussions in this section. <a href="https://wpgeodirectory.com/downloads/location-manager/" class="Button Button--link">Purchase License</a></p></div>';
                 }
             }
             return $attributes;

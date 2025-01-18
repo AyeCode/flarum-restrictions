@@ -47,20 +47,20 @@ class LicenseChecker
 
     private function get_cookie_data()
     {
-        file_put_contents(
-            storage_path('logs/cookie-debug.log'),
-            "Checking cookies: " . print_r($_COOKIE, true) . "\n",
-            FILE_APPEND
-        );
+//        file_put_contents(
+//            storage_path('logs/cookie-debug.log'),
+//            "Checking cookies: " . print_r($_COOKIE, true) . "\n",
+//            FILE_APPEND
+//        );
 
         if (isset($_COOKIE['ayecode_licenses'])) {
             $license_data = json_decode($_COOKIE['ayecode_licenses'], true);
 
-            file_put_contents(
-                storage_path('logs/cookie-debug.log'),
-                "Found license data: " . print_r($license_data, true) . "\n",
-                FILE_APPEND
-            );
+//            file_put_contents(
+//                storage_path('logs/cookie-debug.log'),
+//                "Found license data: " . print_r($license_data, true) . "\n",
+//                FILE_APPEND
+//            );
 
             return $license_data;
         }
@@ -71,12 +71,12 @@ class LicenseChecker
     private function has_required_product($user_products, $tag_slug)
     {
         // Log what we're checking
-        file_put_contents(
-            storage_path('logs/access-debug.log'),
-            "Checking access for tag: {$tag_slug}\n" .
-            "User products: " . print_r($user_products, true) . "\n",
-            FILE_APPEND
-        );
+//        file_put_contents(
+//            storage_path('logs/access-debug.log'),
+//            "Checking access for tag: {$tag_slug}\n" .
+//            "User products: " . print_r($user_products, true) . "\n",
+//            FILE_APPEND
+//        );
 
         // First check if user has any membership products
         foreach ($this->product_mappings['membership-products'] as $membership_id) {

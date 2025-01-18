@@ -23,3 +23,9 @@ composer require ayecode/flarum-restrictions
 ## License
 
 This extension is licensed under the MIT License.
+
+## Changelog
+
+= 0.1.6 =
+* Alert notice shows on general forum and topics - FIXED
+* Remove debugging - CHANGED
