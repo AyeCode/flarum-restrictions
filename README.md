@@ -26,6 +26,6 @@ This extension is licensed under the MIT License.
 
 ## Changelog
 
-= 0.1.6 =
+= 0.1.7 =
 * Alert notice shows on general forum and topics - FIXED
 * Remove debugging - CHANGED
