@@ -1,6 +1,6 @@
 {
   "name": "ayecode/flarum-restrictions",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Restrict Flarum content based on EDD licenses",
   "type": "flarum-extension",
   "private": true,

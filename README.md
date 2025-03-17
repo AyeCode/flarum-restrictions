@@ -26,7 +26,7 @@ This extension is licensed under the MIT License.
 
 ## Changelog
 
-= 0.1.8 =
+= 0.1.9 =
 * added GD core forum to open forums
 
 = 0.1.7 =
