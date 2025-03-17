@@ -7,6 +7,9 @@ const SessionDropdown = flarum.core.compat['components/SessionDropdown'];
 
 
 app.initializers.add('ayecode/flarum-restrictions', function () {
+    // Define array of allowed forums
+    const allowedForums = ['general', 'geodirectory-core']; // Forums that are allowed to be seen without a license
+
     let currentAlert = null;
     let lastCheckedTag = null;
 
@@ -24,11 +27,11 @@ app.initializers.add('ayecode/flarum-restrictions', function () {
 
         // Only check if we have a discussion and haven't shown alert yet
         if (discussionId && !currentAlert && !this.discussion.canReply()) {
-            // Check if discussion has tags and none of them is 'general'
+            // Check if discussion has tags and none of them are in allowedForums
             const tags = this.discussion.tags();
-            const hasNonGeneralTag = tags && tags.some(tag => tag.slug() !== 'general');
+            const hasNonAllowedTag = tags && !tags.some(tag => allowedForums.includes(tag.slug()));
 
-            if (hasNonGeneralTag) {
+            if (hasNonAllowedTag) {
                 currentAlert = app.alerts.show(
                     { type: 'error' },
                     'You must have a valid license to reply to this discussion.'
@@ -44,7 +47,7 @@ app.initializers.add('ayecode/flarum-restrictions', function () {
         if (currentTag && currentTag !== lastCheckedTag) {
             lastCheckedTag = currentTag;
 
-            if (currentTag.slug() !== 'general' && !currentTag.canStartDiscussion()) {
+            if (!allowedForums.includes(currentTag.slug()) && !currentTag.canStartDiscussion()) {
                 currentAlert = app.alerts.show(
                     { type: 'error' },
                     'You must have a valid license to start a discussion in this section.'
