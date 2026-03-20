@@ -20,12 +20,20 @@ composer require ayecode/flarum-restrictions
 2. Enable it in the Flarum admin panel
 3. Configure tag restrictions in the settings
 
+## Release
+- Run 'npm run build'
+- Update version number in composer.json
+- Update version number in README.md
+
 ## License
 
 This extension is licensed under the MIT License.
 
 ## Changelog
 
+= 0.1.10 =
+* Removed posting access to all forums unless a paid member has a license.
+* 
 = 0.1.9 =
 * added GD core forum to open forums
 

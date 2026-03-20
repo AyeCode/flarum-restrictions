@@ -8,7 +8,7 @@ const SessionDropdown = flarum.core.compat['components/SessionDropdown'];
 
 app.initializers.add('ayecode/flarum-restrictions', function () {
     // Define array of allowed forums
-    const allowedForums = ['general', 'geodirectory-core']; // Forums that are allowed to be seen without a license
+    const allowedForums = []; // removed access to all forums ['general', 'geodirectory-core']; // Forums that are allowed to be seen without a license
 
     let currentAlert = null;
     let lastCheckedTag = null;

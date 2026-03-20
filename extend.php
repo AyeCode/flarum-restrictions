@@ -14,7 +14,7 @@ use AyeCode\FlarumRestrictions\Access\LicenseChecker;
 use AyeCode\FlarumRestrictions\Policy\TagPolicy;
 
 // Define array of allowed forums
-$allowedForums = ['general', 'geodirectory-core']; // Add your forums here
+$allowedForums = []; // remove access to all forums unless you are a paid member. ['general', 'geodirectory-core']; // Add your forums here
 
 return [
     // register our new templates

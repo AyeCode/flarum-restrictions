@@ -10,7 +10,7 @@ use AyeCode\FlarumRestrictions\Access\LicenseChecker;
 class TagPolicy extends AbstractPolicy
 {
     // Define array of allowed forums
-    protected $allowedForums = ['general', 'geodirectory-core']; // Add your forums here
+    protected $allowedForums = []; // remove access to all forums unless you are a paid member. ['general', 'geodirectory-core']; // Add your forums here
 
     public function startDiscussion(User $actor, Tag $tag)
     {
