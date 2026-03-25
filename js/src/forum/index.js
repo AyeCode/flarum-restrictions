@@ -57,7 +57,7 @@ app.initializers.add('ayecode/flarum-restrictions', function () {
     });
 
     // Disable "Start Discussion" button on homepage if user can't post to any forum
-    extend(IndexPage.prototype, 'actionItems', function (items) {
+    extend(IndexPage.prototype, 'sidebarItems', function (items) {
         const currentTag = this.currentTag && typeof this.currentTag === 'function' ? this.currentTag() : null;
 
         // If we're on the homepage (no specific tag selected)
@@ -67,8 +67,8 @@ app.initializers.add('ayecode/flarum-restrictions', function () {
             const canPostToAnyForum = tags.some(tag => tag.canStartDiscussion());
 
             // If user can't post to any forum, disable the start discussion button
-            if (!canPostToAnyForum && items.has('startDiscussion')) {
-                items.remove('startDiscussion');
+            if (!canPostToAnyForum && items.has('newDiscussion')) {
+                items.remove('newDiscussion');
             }
         }
     });

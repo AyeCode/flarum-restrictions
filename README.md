@@ -31,7 +31,7 @@ This extension is licensed under the MIT License.
 
 ## Changelog
 
-= 0.1.12 =
+= 0.1.14 =
 * Home page start discussion button should be disabled for users with no licenses.
 
 = 0.1.11 =
