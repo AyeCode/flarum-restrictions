@@ -9,16 +9,11 @@ use AyeCode\FlarumRestrictions\Access\LicenseChecker;
 
 class TagPolicy extends AbstractPolicy
 {
-    // Define array of allowed forums
-    protected $allowedForums = []; // remove access to all forums unless you are a paid member. ['general', 'geodirectory-core']; // Add your forums here
-
     public function startDiscussion(User $actor, Tag $tag)
     {
-        if (!in_array($tag->slug, $this->allowedForums)) {
-            $checker = new LicenseChecker();
-            if (!$checker->can_access($actor, $tag->slug)) {
-                return false;
-            }
+        $checker = new LicenseChecker();
+        if (!$checker->can_access($actor, $tag->slug)) {
+            return false;
         }
     }
 }

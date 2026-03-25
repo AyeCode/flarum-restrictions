@@ -68,6 +68,30 @@ class LicenseChecker
         return null;
     }
 
+    private function has_any_product($user_products)
+    {
+        // Check if user has any membership products
+        foreach ($this->product_mappings['membership-products'] as $membership_id) {
+            if (in_array($membership_id, $user_products)) {
+                return true;
+            }
+        }
+
+        // Check if user has any product from the product mappings
+        foreach ($this->product_mappings as $key => $product_id) {
+            // Skip membership-products and empty entries
+            if ($key === 'membership-products' || empty($product_id)) {
+                continue;
+            }
+
+            if (in_array($product_id, $user_products)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function has_required_product($user_products, $tag_slug)
     {
         // Log what we're checking
@@ -93,7 +117,7 @@ class LicenseChecker
         return false;
     }
 
-    public function can_access(User $user = null, $tag_slug = null): bool
+    public function can_access(User $user = null, $tag_slug = null, $require_any_product = false): bool
     {
 
         // Allow admins and mods
@@ -109,6 +133,12 @@ class LicenseChecker
         $cookie_data = $this->get_cookie_data();
 
         if ($cookie_data && isset($cookie_data['products'])) {
+            // For 'general' and 'geodirectory-core' forums, check if user has ANY product
+            if ($require_any_product || in_array($tag_slug, ['general', 'geodirectory-core'])) {
+                return $this->has_any_product($cookie_data['products']);
+            }
+
+            // For other forums, check for specific product
             return $this->has_required_product($cookie_data['products'], $tag_slug);
         }
 

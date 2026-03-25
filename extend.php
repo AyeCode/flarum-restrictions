@@ -13,8 +13,8 @@ use Flarum\Tags\Tag;
 use AyeCode\FlarumRestrictions\Access\LicenseChecker;
 use AyeCode\FlarumRestrictions\Policy\TagPolicy;
 
-// Define array of allowed forums
-$allowedForums = []; // remove access to all forums unless you are a paid member. ['general', 'geodirectory-core']; // Add your forums here
+// Define array of forums that require any paid product (not specific product)
+$anyProductForums = ['general', 'geodirectory-core'];
 
 return [
     // register our new templates
@@ -51,15 +51,13 @@ return [
 
     // Discussion reply restriction
     (new Extend\ApiSerializer(DiscussionSerializer::class))
-        ->attributes(function(DiscussionSerializer $serializer, Discussion $discussion, array $attributes) use ($allowedForums) {
+        ->attributes(function(DiscussionSerializer $serializer, Discussion $discussion, array $attributes) use ($anyProductForums) {
             if ($discussion->tags) {
                 foreach ($discussion->tags as $tag) {
-                    if (!in_array($tag->slug, $allowedForums)) {
-                        $checker = new LicenseChecker();
-                        if (!$checker->can_access($serializer->getActor(), $tag->slug)) {
-                            $attributes['canReply'] = false;
-                            // $attributes['replyPlaceholder'] = 'You must have a valid license to reply to this discussion. <a href="https://wpgeodirectory.com/downloads/location-manager/" class="Button Button--link">Purchase License</a>';
-                        }
+                    $checker = new LicenseChecker();
+                    if (!$checker->can_access($serializer->getActor(), $tag->slug)) {
+                        $attributes['canReply'] = false;
+                        // $attributes['replyPlaceholder'] = 'You must have a valid license to reply to this discussion. <a href="https://wpgeodirectory.com/downloads/location-manager/" class="Button Button--link">Purchase License</a>';
                     }
                 }
             }
@@ -68,14 +66,12 @@ return [
 
     // Tag permissions
     (new Extend\ApiSerializer(TagSerializer::class))
-        ->attributes(function(TagSerializer $serializer, Tag $tag, array $attributes) use ($allowedForums) {
-            if (!in_array($tag->slug, $allowedForums)) {
-                $checker = new LicenseChecker();
-                if (!$checker->can_access($serializer->getActor(), $tag->slug)) {
-                    $attributes['canStartDiscussion'] = false;
-                    $attributes['canAddToDiscussion'] = false;
-                    //   $attributes['description'] = ($attributes['description'] ?? '') . ' <div class="Alert Alert--warning"><p>You need a valid license to start discussions in this section. <a href="https://wpgeodirectory.com/downloads/location-manager/" class="Button Button--link">Purchase License</a></p></div>';
-                }
+        ->attributes(function(TagSerializer $serializer, Tag $tag, array $attributes) use ($anyProductForums) {
+            $checker = new LicenseChecker();
+            if (!$checker->can_access($serializer->getActor(), $tag->slug)) {
+                $attributes['canStartDiscussion'] = false;
+                $attributes['canAddToDiscussion'] = false;
+                //   $attributes['description'] = ($attributes['description'] ?? '') . ' <div class="Alert Alert--warning"><p>You need a valid license to start discussions in this section. <a href="https://wpgeodirectory.com/downloads/location-manager/" class="Button Button--link">Purchase License</a></p></div>';
             }
             return $attributes;
         }),

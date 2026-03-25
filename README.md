@@ -31,9 +31,12 @@ This extension is licensed under the MIT License.
 
 ## Changelog
 
+= 0.1.11 =
+* Fixed bug where forum access was not being checked.
+
 = 0.1.10 =
 * Removed posting access to all forums unless a paid member has a license.
-* 
+
 = 0.1.9 =
 * added GD core forum to open forums
 
