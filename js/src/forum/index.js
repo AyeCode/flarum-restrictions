@@ -1,9 +1,12 @@
 const app = flarum.core.compat['forum/app'];
-const { extend } = flarum.core.compat['common/extend'];
+const { extend, override } = flarum.core.compat['common/extend'];
 const DiscussionPage = flarum.core.compat['components/DiscussionPage'];
 const Page = flarum.core.compat['components/Page'];
 const IndexPage = flarum.core.compat['components/IndexPage'];
-const SessionDropdown = flarum.core.compat['components/SessionDropdown'];
+const HeaderSecondary = flarum.core.compat['components/HeaderSecondary'];
+const LogInModal = flarum.core.compat['components/LogInModal'];
+const SignUpModal = flarum.core.compat['components/SignUpModal'];
+const Button = flarum.core.compat['components/Button'];
 
 
 app.initializers.add('ayecode/flarum-restrictions', function () {
@@ -74,46 +77,36 @@ app.initializers.add('ayecode/flarum-restrictions', function () {
     });
 
 
-    // Modify logout with AJAX
-    extend(SessionDropdown.prototype, 'items', function(items) {
-        const logOutItem = items._items.logOut;
-        if (logOutItem && logOutItem.content) {
-            logOutItem.content = m('button.Button.hasIcon', {
-                onclick: function(e) {
-                    e.preventDefault();
+    // Log in with AyeCode: login and sign up both go to the store (OAuth, /auth/ayecode). Forum passwords are empty,
+    // so there is nothing to type here. Log out is Flarum's own again (it used to call the old WordPress server).
+    // app.forum is not loaded yet when initializers run, so the setting is read when each piece renders.
+    const ssoOn = function () {
+        return !!(app.forum && app.forum.attribute('ayecodeSso'));
+    };
+    const goToStore = function () {
+        const base = app.forum.attribute('baseUrl');
+        window.location.href = base + '/auth/ayecode?return=' + encodeURIComponent(window.location.href);
+    };
 
-                    // Create form data
-                    const formData = new FormData();
-                    formData.append('nopriv_nonce', '103d78334b6e9b8a4089ebce577411ed');
-
-                    // Make AJAX call
-                    fetch('https://wpgeodirectory.com/support/wp-admin/admin-ajax.php?action=ayetheme_logout', {
-                        method: 'POST',
-                        credentials: 'include',
-                        body: formData
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                window.location.reload();
-                            } else {
-                                app.alerts.show(
-                                    { type: 'error' },
-                                    'Logout failed. Please try again.'
-                                );
-                            }
-                        })
-                        .catch(error => {
-                            app.alerts.show(
-                                { type: 'error' },
-                                'Logout failed. Please try again.'
-                            );
-                        });
-                }
-            }, [
-                m('i.icon.fas.fa-sign-out-alt.Button-icon', {'aria-hidden': 'true'}),
-                m('span.Button-label', 'Log Out')
-            ]);
+    extend(HeaderSecondary.prototype, 'items', function (items) {
+        if (!ssoOn()) {
+            return;
         }
+        if (items.has('signUp')) {
+            items.remove('signUp');
+        }
+        if (items.has('logIn')) {
+            items.setContent('logIn', m(Button, { className: 'Button Button--link', onclick: goToStore }, 'Log in with AyeCode'));
+        }
+    });
+
+    // Anything else that asks for a login (reply as a guest, etc.) opens one of these modals: go to the store instead.
+    [LogInModal, SignUpModal].forEach(function (Modal) {
+        override(Modal.prototype, 'oninit', function (original, vnode) {
+            if (ssoOn()) {
+                goToStore();
+            }
+            return original(vnode);
+        });
     });
 });

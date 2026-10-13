@@ -5,6 +5,10 @@ namespace AyeCode\FlarumRestrictions\Access;
 use Flarum\User\User;
 use Flarum\Tags\Tag;
 
+/**
+ * Paid access per tag. A user's licences come from the AyeCode API (see Entitlements), looked up server side by
+ * their confirmed email. Product ids are the store's (originally EDD) ids, which the API keeps.
+ */
 class LicenseChecker
 {
     // Define product IDs
@@ -44,29 +48,6 @@ class LicenseChecker
             '807546', // LTD
         ) // Membership products that give access to all
     );
-
-    private function get_cookie_data()
-    {
-//        file_put_contents(
-//            storage_path('logs/cookie-debug.log'),
-//            "Checking cookies: " . print_r($_COOKIE, true) . "\n",
-//            FILE_APPEND
-//        );
-
-        if (isset($_COOKIE['ayecode_licenses'])) {
-            $license_data = json_decode($_COOKIE['ayecode_licenses'], true);
-
-//            file_put_contents(
-//                storage_path('logs/cookie-debug.log'),
-//                "Found license data: " . print_r($license_data, true) . "\n",
-//                FILE_APPEND
-//            );
-
-            return $license_data;
-        }
-
-        return null;
-    }
 
     private function has_any_product($user_products)
     {
@@ -117,6 +98,32 @@ class LicenseChecker
         return false;
     }
 
+    /**
+     * Product ids the user holds an active licence for (all brands), and whether any GeoDirectory membership is
+     * active. Null when the API could not answer.
+     */
+    private function get_user_products(User $user)
+    {
+        $brands = resolve(Entitlements::class)->brands($user);
+        if ($brands === null) {
+            return null;
+        }
+
+        $products = array();
+        foreach ($brands as $brand => $info) {
+            foreach ((array) ($info['products'] ?? array()) as $id) {
+                $products[] = (string) $id;
+            }
+        }
+
+        // The API knows every membership id per brand (including ones added after this list was written).
+        if (! empty($brands['geodirectory']['membership'])) {
+            $products[] = $this->product_mappings['membership-products'][0];
+        }
+
+        return array_values(array_unique($products));
+    }
+
     public function can_access(User $user = null, $tag_slug = null, $require_any_product = false): bool
     {
 
@@ -125,23 +132,23 @@ class LicenseChecker
             return true;
         }
 
-        // If no tag slug provided, return false
-        if (!$tag_slug) {
+        // If no tag slug provided, or nobody is logged in, return false
+        if (!$tag_slug || !$user || $user->isGuest()) {
             return false;
         }
 
-        $cookie_data = $this->get_cookie_data();
-
-        if ($cookie_data && isset($cookie_data['products'])) {
-            // For 'general' and 'geodirectory-core' forums, check if user has ANY product
-            if ($require_any_product || in_array($tag_slug, ['general', 'geodirectory-core'])) {
-                return $this->has_any_product($cookie_data['products']);
-            }
-
-            // For other forums, check for specific product
-            return $this->has_required_product($cookie_data['products'], $tag_slug);
+        // Fail closed: if the API cannot say, paid areas stay shut (the page itself still loads)
+        $user_products = $this->get_user_products($user);
+        if (!$user_products) {
+            return false;
         }
 
-        return false;
+        // For 'general' and 'geodirectory-core' forums, check if user has ANY product
+        if ($require_any_product || in_array($tag_slug, ['general', 'geodirectory-core'])) {
+            return $this->has_any_product($user_products);
+        }
+
+        // For other forums, check for specific product
+        return $this->has_required_product($user_products, $tag_slug);
     }
 }

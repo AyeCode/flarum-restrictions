@@ -1,6 +1,6 @@
 # AyeCode Flarum Restrictions
 
-A Flarum extension to restrict content based on EDD licenses.
+A Flarum extension that restricts content by AyeCode licence and logs people in with their AyeCode store account.
 
 ## Installation
 
@@ -10,15 +10,26 @@ composer require ayecode/flarum-restrictions
 
 ## Features
 
-- Restrict access to specific tags based on EDD product licenses
-- Controls viewing and replying permissions
-- Integrates with WordPress and EDD license system
+- Restricts starting and replying to discussions per tag by product licence. Licences come from the AyeCode API (`GET /v1/entitlements?email=...`, server side, by the user's confirmed email), cached per user for 10 minutes. If the API cannot be reached paid areas stay closed but pages still load (3 second timeout, then the API is skipped for a minute).
+- Log in with AyeCode: login and sign up go to the store (`account.wpgeodirectory.com`, plugin `ayecode-sso`) by OAuth 2 with PKCE. Existing accounts are matched by the WordPress user id the old `flarum-wp-users` login recorded, then by confirmed email; new people get an account. Forum passwords stay empty.
 
 ## Configuration
 
-1. Install the extension via composer
-2. Enable it in the Flarum admin panel
-3. Configure tag restrictions in the settings
+Values are read from Flarum's `config.php`, then `AYECODE_*` environment variables, then the extension's admin settings. Secrets never go in this repository.
+
+```php
+'ayecode' => [
+    'entitlements_token' => '...',   // the API Worker secret ENTITLEMENTS_TOKEN
+    'sso_client_secret'  => '...',   // the 'forum' client secret in AYECODE_SSO_CLIENTS on the store
+    // optional: 'api_base' => 'https://api.ayecode.io', 'sso_url' => 'https://account.wpgeodirectory.com', 'sso_client_id' => 'forum'
+],
+```
+
+The store must list `<forum url>/auth/ayecode` as the client's redirect URI. Login switches to the store as soon as the client secret is set.
+
+## Tests
+
+`tests/integration-local.php` runs against a throwaway Flarum, the local dev Worker and a local WordPress with `ayecode-sso` (see the header of the file).
 
 ## Release
 - Run 'npm run build'
@@ -30,6 +41,12 @@ composer require ayecode/flarum-restrictions
 This extension is licensed under the MIT License.
 
 ## Changelog
+
+= 0.2.0 =
+* Paid access now comes from the AyeCode API instead of the `ayecode_licenses` cookie, which was never verified and could be forged - CHANGED
+* Log in with AyeCode (OAuth 2 with PKCE against the store) replaces the WordPress database login - ADDED
+* Log out is Flarum's own again; it no longer calls the old WordPress server - CHANGED
+* Admin settings for the API and the SSO client - ADDED
 
 = 0.1.14 =
 * Home page start discussion button should be disabled for users with no licenses.

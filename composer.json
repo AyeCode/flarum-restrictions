@@ -1,14 +1,15 @@
 {
   "name": "ayecode/flarum-restrictions",
-  "version": "0.1.14",
-  "description": "Restrict Flarum content based on EDD licenses",
+  "version": "0.2.0",
+  "description": "Restrict Flarum content by AyeCode licence (from the AyeCode API) and log in with an AyeCode account",
   "type": "flarum-extension",
   "private": true,
   "keywords": [
     "flarum",
     "restrictions",
-    "edd",
-    "license"
+    "license",
+    "sso",
+    "oauth"
   ],
   "license": "MIT",
   "authors": [

@@ -8,10 +8,12 @@ use Flarum\Post\Post;
 use Flarum\Api\Serializer\PostSerializer;
 use Flarum\Api\Serializer\DiscussionSerializer;
 use Flarum\Api\Serializer\TagSerializer;
+use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Discussion\Discussion;
 use Flarum\Tags\Tag;
 use AyeCode\FlarumRestrictions\Access\LicenseChecker;
 use AyeCode\FlarumRestrictions\Policy\TagPolicy;
+use AyeCode\FlarumRestrictions\Sso\LoginController;
 
 // Define array of forums that require any paid product (not specific product)
 $anyProductForums = ['general', 'geodirectory-core'];
@@ -25,6 +27,19 @@ return [
         ->js(__DIR__ . '/js/dist/forum.js')
         ->content(function (\Flarum\Frontend\Document $document) { // set new template
             $document->layoutView = "flarum-restrictions::frontend.forum";
+        }),
+
+    // Settings page (API token and SSO client; config.php or env take precedence, see src/Settings.php)
+    (new Extend\Frontend('admin'))
+        ->js(__DIR__ . '/js/dist/admin.js'),
+
+    // Log in with AyeCode (OAuth 2 against the store, replaces flarum-wp-users)
+    (new Extend\Routes('forum'))
+        ->get('/auth/ayecode', 'ayecode.sso', LoginController::class),
+
+    (new Extend\ApiSerializer(ForumSerializer::class))
+        ->attribute('ayecodeSso', function () {
+            return resolve(Settings::class)->ssoReady();
         }),
 
     // Content restriction

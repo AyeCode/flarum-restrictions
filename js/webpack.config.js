@@ -7,6 +7,7 @@ module.exports = {
     mode: 'production', // or 'development'
     entry: {
         forum: path.resolve(__dirname, 'src/forum/index.js'),
+        admin: path.resolve(__dirname, 'src/admin/index.js'),
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
